@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Safe Land | Corporate dashboard</title>
+<style>
+:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--ink:#14201b;--muted:#53645c;--green:#006a4e;--deep:#004d38;--tint:#eaf4ef;--line:#c9ddd2;--gold:#f2b134;--err:#b42318;--font:Arial,"Helvetica Neue",sans-serif}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:#fff;color:var(--ink);font-family:var(--font);line-height:1.5}
+[hidden]{display:none!important}
+button,input,select{font:inherit}
+.bar{background:var(--green);color:#fff;border-bottom:4px solid var(--gold)}
+.bar>div{max-width:1040px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px}
+.bar svg{width:46px;height:46px;flex:none}
+.bar strong{display:block;font-size:1.2rem}
+.bar span{font-size:.85rem;opacity:.9}
+.back,.out{background:none;border:2px solid #fff;color:#fff;border-radius:3px;cursor:pointer;flex:none}
+.back{width:40px;height:40px;font-size:1.3rem;line-height:1}
+.out{padding:6px 12px;font-weight:700}
+.back:hover,.out:hover{background:var(--deep)}
+.right{margin-left:auto;display:flex;align-items:center;gap:12px;text-align:right}
+.tabs{background:var(--tint);border-bottom:1px solid var(--line)}
+.tabs>div{max-width:1040px;margin:0 auto;padding:0 20px;display:flex;flex-wrap:wrap;gap:4px}
+.tabs button{background:none;border:0;border-bottom:4px solid transparent;padding:12px 14px;font-weight:700;color:var(--deep);cursor:pointer}
+.tabs button[aria-selected=true]{border-bottom-color:var(--green);background:#fff}
+button:focus-visible,input:focus,select:focus{outline:3px solid var(--gold);outline-offset:1px}
+.wrap{max-width:1040px;margin:0 auto;padding:24px 20px 40px;min-height:60vh}
+.ph{margin:0 0 6px;font-size:1.5rem;color:var(--deep)}
+h2{font-size:1.1rem;margin:24px 0 8px;color:var(--deep)}
+.sub{color:var(--muted);margin:0 0 8px}
+.flow{list-style:none;counter-reset:s;display:flex;flex-wrap:wrap;gap:10px;padding:0;margin:16px 0}
+.flow li{counter-increment:s;flex:1 1 150px;border:1px solid var(--line);border-top:4px solid var(--green);border-radius:4px;padding:10px;font-size:.9rem}
+.flow li::before{content:"Step " counter(s);display:block;color:var(--muted);font-size:.8rem}
+.flow .lk{border-top-color:var(--gold);background:#fff9ec}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
+.box{border:1px solid var(--line);border-radius:4px;padding:14px}
+.box p{margin:6px 0}
+.badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:.8rem;font-weight:700;color:#fff}
+.b-a{background:var(--green)}.b-l{background:#8a5a00}.b-p{background:var(--deep)}.b-x{background:var(--err)}
+label{display:block;font-weight:700;font-size:.92rem;margin:10px 0}
+input,select{display:block;width:100%;max-width:420px;margin-top:5px;padding:10px 12px;border:1px solid #6f8f80;border-radius:3px;background:#fff;color:var(--ink)}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.btn{background:var(--green);color:#fff;border:0;border-radius:3px;padding:10px 14px;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--deep)}
+.btn.ghost{background:#fff;color:var(--green);border:2px solid var(--green)}
+.btn.sm{padding:6px 10px;font-size:.85rem}
+.msg{min-height:1.5em;font-weight:700;color:var(--deep)}
+.msg.bad{color:var(--err)}
+ul.hist{margin:6px 0 0;padding-left:20px;font-size:.9rem}
+.alert{border:1px solid var(--line);border-left:6px solid var(--err);border-radius:4px;padding:12px;margin-bottom:10px}
+.alert p{margin:4px 0}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+.row b{min-width:64px}
+svg.map{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:4px}
+.foot{background:var(--tint);border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;text-align:center;padding:14px 20px}
+</style>
+</head>
+<body>
+<header class="bar"><div>
+  <button type="button" class="back" id="back" aria-label="Back to previous page" title="Back">&larr;</button>
+  <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#fff"/><path d="M8 33a14 14 0 0 1 28 0z" fill="#006a4e"/><path d="M22 33V20M22 28l-5-5M22 25l5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+  <div><strong>Safe Land</strong><span>Corporate dashboard</span></div>
+  <div class="right"><span id="off"></span><button type="button" class="out" id="out">Log out</button></div>
+</div></header>
+
+<nav class="tabs"><div role="tablist">
+  <button role="tab" data-t="lock">Escrow lock engine</button>
+  <button role="tab" data-t="agri">AgriZoning Sentinel</button>
+  <button role="tab" data-t="balu">Balu Geofence</button>
+</div></nav>
+
+<main class="wrap">
+<section data-p="lock">
+  <h1 class="ph">Atomic escrow and temporary lock engine</h1>
+  <p class="sub">For Sub-Registrars, AC (Land) officers, banks and legal teams.</p>
+  <ol class="flow">
+    <li>Owner A signs the deed</li>
+    <li>Sub-Registry Office generates a deed registration token</li>
+    <li class="lk"><b>Temporary escrow lock (1 second).</b> The original owner cannot sell again, secondary buyers cannot buy, and banks cannot mortgage.</li>
+    <li>Automatic digital notice goes to the AC (Land) Office</li>
+    <li>Mutation is completed</li>
+    <li>Ownership is permanently transferred</li>
+  </ol>
+  <h2>Real-time state machine</h2>
+  <div class="grid">
+    <div class="box"><span class="badge b-a">ACTIVE_VERIFIED</span><p>The plot is clean and tradeable.</p></div>
+    <div class="box"><span class="badge b-l">TEMPORARY_ESCROW_LOCK</span><p>Starts the moment a deed registration token is generated at the Sub-Registry. The plot is frozen across the national database. Neither the seller nor any third party can start another deed, power of attorney or mortgage on it.</p></div>
+    <div class="box"><span class="badge b-p">PERMANENT_RECORD_UPDATED</span><p>Starts when the AC (Land) office finishes e-Mutation. The lock is released and the buyer becomes the permanent titleholder.</p></div>
+  </div>
+  <p class="sub" style="margin-top:12px">Banks and legal teams can confirm a plot is not in a hidden transition window before they lend or buy.</p>
+  <h2>Plot control</h2>
+  <div class="box">
+    <label>Plot<select id="plotSel"></select></label>
+    <div id="plotInfo"></div>
+    <label>Buyer name (for a new deed)<input id="buyer" autocomplete="off"></label>
+    <div class="btns">
+      <button type="button" class="btn" id="bLock">Register deed and lock plot</button>
+      <button type="button" class="btn" id="bMut">Complete e-Mutation</button>
+      <button type="button" class="btn ghost" id="bTry">Try a new sale or mortgage</button>
+    </div>
+    <p class="msg" id="plotMsg" role="status"></p>
+    <b>History</b>
+    <ul class="hist" id="hist"></ul>
+  </div>
+</section>
+
+<section data-p="agri" hidden>
+  <h1 class="ph">AgriZoning Sentinel</h1>
+  <p class="sub">Topsoil theft and farmland protection. Free Earth-observation satellites scan the country every few days. Farmland is normally green and moist, so a sudden dry, barren patch means topsoil was scraped away or filled with clay or sand. The system flags the exact plot and alerts the Upazila Agriculture Officer and AC (Land).</p>
+  <div class="grid" style="margin-top:14px">
+    <div>
+      <svg class="map" id="agMap" viewBox="0 0 280 160" role="img" aria-label="Satellite scan grid, red cells are flagged plots"></svg>
+      <p class="sub">Latest scan. Red cells are flagged plots.</p>
+    </div>
+    <div id="alerts"></div>
+  </div>
+</section>
+
+<section data-p="balu" hidden>
+  <h1 class="ph">Balu Geofence</h1>
+  <p class="sub">Sand mining and riverbank defense. The government draws the legal Balu Mahal box on the river map, and every legal dredger carries a solar-powered GPS tracker. Inside the box is fine. Outside the line, or running the pump during banned night hours, sends an instant alert to the River Police and the Deputy Commissioner (DC).</p>
+  <div class="grid" style="margin-top:14px">
+    <svg class="map" id="river" viewBox="0 0 400 220" role="img" aria-label="River map with the legal Balu Mahal box and dredger positions"></svg>
+    <div>
+      <div id="dredgers"></div>
+    </div>
+  </div>
+  <h2>Live alerts</h2>
+  <div id="bAlerts"></div>
+</section>
+</main>
+<footer class="foot">Safe Land corporate dashboard. Plots, alerts and positions shown here are sample data.</footer>
+
+<script src="storage.js"></script>
+<script>
+(()=>{
+const S=LantStore,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const me=S.session();
+if(!me||me.role!=='corp'){location.replace('index.html');return}
+$('#off').textContent=me.name;
+const leave=()=>{S.endSession();location.href='index.html#login'};
+$('#back').onclick=leave;$('#out').onclick=leave;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* Tabs */
+function tab(t){$$('[data-t]').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));$$('[data-p]').forEach(p=>p.hidden=p.dataset.p!==t)}
+$$('[data-t]').forEach(b=>b.onclick=()=>tab(b.dataset.t));tab('lock');
+
+/* 1. Escrow lock engine */
+const sel=$('#plotSel'),CLS={ACTIVE_VERIFIED:'b-a',TEMPORARY_ESCROW_LOCK:'b-l',PERMANENT_RECORD_UPDATED:'b-p'};
+sel.innerHTML=Object.entries(S.plots()).map(([k,p])=>`<option value="${esc(k)}">${esc(p.place)}</option>`).join('');
+const cur=()=>S.plots()[sel.value],locked=()=>cur().state==='TEMPORARY_ESCROW_LOCK';
+function say(m,bad){const e=$('#plotMsg');e.textContent=m||'';e.className='msg'+(bad?' bad':'')}
+function drawPlot(){
+  const p=cur(),l=locked();
+  $('#plotInfo').innerHTML=`<p><span class="badge ${CLS[p.state]}">${p.state}</span></p><p>Titleholder: <b>${esc(p.owner)}</b>${l?'<br>Incoming buyer: <b>'+esc(p.buyer)+'</b>':''}</p><p>Safe to lend or buy: <b>${l?'No, the plot is locked':'Yes'}</b></p>`;
+  $('#hist').innerHTML=(p.history||[]).slice().reverse().map(h=>`<li>${esc(new Date(h.at).toLocaleString())}: ${esc(h.m)}</li>`).join('')||'<li>No activity yet.</li>';
+}
+sel.onchange=()=>{say();drawPlot()};
+$('#bLock').onclick=()=>{
+  if(locked())return say('Blocked: this plot is already under a temporary escrow lock.',1);
+  const b=$('#buyer').value.trim();if(!b)return say('Enter the buyer name first.',1);
+  S.lockPlot(sel.value,b);$('#buyer').value='';drawPlot();say('Plot locked. A digital notice was sent to the AC (Land) office.');
+};
+$('#bMut').onclick=()=>{
+  if(!locked())return say('Nothing to complete. This plot has no pending deed.',1);
+  const b=cur().buyer;S.completeMutation(sel.value);drawPlot();say('e-Mutation complete. The lock is released and '+b+' is the permanent titleholder.');
+};
+$('#bTry').onclick=()=>locked()?say('Blocked: no new sale, power of attorney or mortgage can start on a locked plot.',1):say('Allowed: the plot is clean and tradeable.');
+drawPlot();
+
+/* 3. AgriZoning Sentinel */
+const ag=[
+ {plot:'512',up:'Savar',c:3,r:1,t:'3 acres of fertile topsoil excavated on Daag #512 in Savar. Illegal brickfield activity suspected!'},
+ {plot:'77',up:'Dhamrai',c:1,r:2,t:'Sand dumped over 1.5 acres of green field on Daag #77 in Dhamrai. Unapproved construction suspected!'},
+ {plot:'301',up:'Manikganj',c:5,r:0,t:'Sudden dry patch of 2 acres on 3-crop land at Daag #301 in Manikganj. Topsoil removal suspected!',done:1}
+];
+function drawAg(){
+  let g='';for(let r=0;r<4;r++)for(let c=0;c<7;c++)g+=`<rect x="${c*40+2}" y="${r*40+2}" width="36" height="36" rx="3" fill="${ag.some(a=>a.c===c&&a.r===r)?'#b42318':'#cfe6d9'}"/>`;
+  $('#agMap').innerHTML=g;
+  $('#alerts').innerHTML=ag.map((a,i)=>`<div class="alert"><b>Daag #${a.plot}, ${a.up}</b><p>Warning: ${a.t}</p><p class="sub">Sent to the Upazila Agriculture Officer and AC (Land)</p>${a.done?'<span class="badge b-p">Inspection dispatched</span>':`<button type="button" class="btn sm" data-i="${i}">Dispatch inspection</button>`}</div>`).join('');
+}
+$('#alerts').onclick=e=>{const b=e.target.closest('[data-i]');if(b){ag[b.dataset.i].done=1;drawAg()}};
+drawAg();
+
+/* 4. Balu Geofence */
+const Z={x:130,y:70,w:170,h:80};
+const dr=[{id:'BD-07',x:190,y:100},{id:'BD-09',x:250,y:120},{id:'BD-12',x:160,y:135}].map(d=>({...d,hy:d.y,out:0,night:0}));
+const issues=d=>{const a=[];
+  if(d.out)a.push(`Alert: Dredger #${d.id} crossed outside the Balu Mahal boundary near Meghna Bridge. Illegal dredging in progress!`);
+  if(d.night)a.push(`Alert: Dredger #${d.id} is running its pump during banned nighttime hours!`);
+  return a};
+function drawBalu(){
+  $('#river').innerHTML=`<path d="M0 40C100 20 200 60 400 35V195C300 215 150 175 0 200Z" fill="#d6e9f0"/>
+  <rect x="${Z.x}" y="${Z.y}" width="${Z.w}" height="${Z.h}" fill="#eaf4ef" fill-opacity=".8" stroke="#006a4e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="${Z.x+6}" y="${Z.y+14}" font-size="11" fill="#004d38">Legal Balu Mahal zone</text>
+  <line x1="352" y1="15" x2="352" y2="215" stroke="#53645c" stroke-width="5"/><text x="312" y="12" font-size="10" fill="#53645c">Meghna Bridge</text>`+
+  dr.map(d=>{const bad=d.out||d.night;return `<circle cx="${d.x}" cy="${d.y}" r="7" fill="${bad?'#b42318':'#006a4e'}" stroke="#fff" stroke-width="2"/><text x="${d.x+10}" y="${d.y+4}" font-size="10" fill="#14201b">${d.id}</text>`}).join('');
+  $('#dredgers').innerHTML=dr.map((d,i)=>`<div class="row"><b>${d.id}</b><span class="badge ${d.out||d.night?'b-x':'b-a'}">${d.out||d.night?'ALERT':'Inside zone'}</span><button type="button" class="btn ghost sm" data-i="${i}" data-k="out">${d.out?'Return inside':'Drift 20 m outside'}</button><button type="button" class="btn ghost sm" data-i="${i}" data-k="night">${d.night?'Stop night pump':'Run pump at night'}</button></div>`).join('');
+  const al=dr.flatMap(issues);
+  $('#bAlerts').innerHTML=al.length?al.map(t=>`<div class="alert"><p>${t}</p><p class="sub">Sent to the River Police and the Deputy Commissioner (DC)</p></div>`).join(''):'<p class="sub">No active alerts. All dredgers are inside the legal zone.</p>';
+}
+$('#dredgers').onclick=e=>{const b=e.target.closest('[data-k]');if(!b)return;const d=dr[b.dataset.i];
+  if(b.dataset.k==='out'){d.out=d.out?0:1;d.y=d.out?Z.y+Z.h+22:d.hy}else d.night=d.night?0:1;
+  drawBalu()};
+drawBalu();
+})();
+</script>
+</body>
+</html>
