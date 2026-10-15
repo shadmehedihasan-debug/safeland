@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Safe Land | Corporate dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link rel="stylesheet" href="corporate.css">
+</head>
+<body>
+<header class="bar"><div>
+  <button type="button" class="back" id="back" aria-label="Back to previous page" title="Back">&larr;</button>
+  <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#fff"/><path d="M8 33a14 14 0 0 1 28 0z" fill="#006a4e"/><path d="M22 33V20M22 28l-5-5M22 25l5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+  <div><strong>Safe Land</strong><span>Corporate dashboard</span></div>
+  <div class="right"><span id="off"></span><button type="button" class="out" id="out">Log out</button></div>
+</div></header>
+
+<nav class="tabs"><div role="tablist">
+  <button role="tab" data-t="lock">E-Registration</button>
+  <button role="tab" data-t="agri">Topsoil Scan</button>
+  <button role="tab" data-t="balu">River Inspection</button>
+</div></nav>
+
+<main class="wrap">
+<section data-p="lock">
+  <h1 class="ph">E-Registration</h1>
+  <p class="sub">For Sub-Registrars, AC (Land) officers, banks and legal teams.</p>
+  <ol class="flow">
+    <li>Owner A signs the deed</li>
+    <li>Sub-Registry Office generates a deed registration token</li>
+    <li class="lk"><b>Temporary escrow lock (1 second).</b> The original owner cannot sell again, secondary buyers cannot buy, and banks cannot mortgage.</li>
+    <li>Automatic digital notice goes to the AC (Land) Office</li>
+    <li>Mutation is completed</li>
+    <li>Ownership is permanently transferred</li>
+  </ol>
+  <h2>Real-time state machine</h2>
+  <div class="grid">
+    <div class="box"><span class="badge b-a">ACTIVE_VERIFIED</span><p>The plot is clean and tradeable.</p></div>
+    <div class="box"><span class="badge b-l">TEMPORARY_ESCROW_LOCK</span><p>Starts the moment a deed registration token is generated at the Sub-Registry. The plot is frozen across the national database. Neither the seller nor any third party can start another deed, power of attorney or mortgage on it.</p></div>
+    <div class="box"><span class="badge b-p">PERMANENT_RECORD_UPDATED</span><p>Starts when the AC (Land) office finishes e-Mutation. The lock is released and the buyer becomes the permanent titleholder.</p></div>
+  </div>
+  <p class="sub" style="margin-top:12px">Banks and legal teams can confirm a plot is not in a hidden transition window before they lend or buy.</p>
+  <h2>Plot control</h2>
+  <div class="box">
+    <label>Plot<select id="plotSel"></select></label>
+    <div id="plotInfo"></div>
+    <label>Buyer name (for a new deed)<input id="buyer" autocomplete="off"></label>
+    <div class="btns">
+      <button type="button" class="btn" id="bLock">Register deed and lock plot</button>
+      <button type="button" class="btn" id="bMut">Complete e-Mutation</button>
+      <button type="button" class="btn ghost" id="bTry">Try a new sale or mortgage</button>
+    </div>
+    <p class="msg" id="plotMsg" role="status"></p>
+    <b>History</b>
+    <ul class="hist" id="hist"></ul>
+  </div>
+</section>
+
+<section data-p="agri" hidden>
+  <h1 class="ph">Topsoil Scan</h1>
+  <p class="sub">Topsoil theft and farmland protection. Free Earth-observation satellites scan the country every few days. Farmland is normally green and moist, so a sudden dry, barren patch means topsoil was scraped away or filled with clay or sand. The system flags the exact plot and alerts the Upazila Agriculture Officer and AC (Land).</p>
+  <div class="btns"><button type="button" class="btn ghost sm" id="agBd">Show Bangladesh</button><button type="button" class="btn ghost sm" id="agFit">Zoom to alerts</button></div>
+  <div class="grid m">
+    <div>
+      <div id="agMap" class="lmap" role="region" aria-label="Map of flagged plots"></div>
+      <p class="sub">Satellite scan map. Red markers are flagged plots and turn dark green once an inspection is dispatched. Marker positions are approximate. Use the control on the map to switch between satellite and street views.</p>
+    </div>
+    <div id="alerts"></div>
+  </div>
+</section>
+
+<section data-p="balu" hidden>
+  <h1 class="ph">River Inspection</h1>
+  <p class="sub">Sand mining and riverbank defense on the Meghna River near Meghna Bridge. The legal Balu Mahal zone is drawn on the map and every legal boat carries a GPS tracker. A boat more than 20 m outside the line, or pumping during banned night hours, sends an alert to the River Police and the Deputy Commissioner (DC).</p>
+  <div class="btns" style="align-items:center">
+    <label style="margin:0">Speed<select id="spd" class="inl"><option value="1">Real time</option><option value="10" selected>10x</option><option value="30">30x</option></select></label>
+    <button type="button" class="btn ghost sm" id="tDrift">Test: BD-07 drifts to the bank</button>
+    <button type="button" class="btn ghost sm" id="tNight">Test: simulate night</button>
+  </div>
+  <p class="sub" id="clock"></p>
+  <div class="grid m">
+    <div>
+      <div id="riverMap" class="lmap" role="region" aria-label="River map with the legal zone and boats"></div>
+      <p class="sub">Dashed green outline: legal Balu Mahal zone. A boat turns amber within 20 m of the line and red when it is more than 20 m outside. Yellow lines are boat trails. Boat positions are simulated, and the zone position is approximate.</p>
+    </div>
+    <div id="dredgers"></div>
+  </div>
+  <h2>Live alerts</h2>
+  <div id="bAlerts"></div>
+</section>
+</main>
+<footer class="foot">Safe Land corporate dashboard. Plots, alerts and positions shown here are sample data. Map positions are approximate.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="storage.js"></script>
+<script src="corporate.js"></script>
+</body>
+</html>

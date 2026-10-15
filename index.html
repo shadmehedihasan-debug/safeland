@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Safe Land</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+<section id="intro">
+  <div class="title">
+    <h1>Safe Land</h1>
+    <p>Dates and venue coming soon</p>
+    <button id="enter" type="button">Enter portal</button>
+  </div>
+  <div class="dome" role="img" aria-label="A tree growing inside a half circle">
+    <svg class="tree" viewBox="0 0 200 200" aria-hidden="true">
+      <path class="t" pathLength="1" d="M100 200 V118"/>
+      <path class="b1" pathLength="1" d="M100 150 C100 135 80 128 62 112" style="--d:.2s"/>
+      <path class="b1" pathLength="1" d="M100 140 C100 128 120 122 138 104" style="--d:.3s"/>
+      <path class="b1" pathLength="1" d="M100 118 C100 100 100 80 100 56" style="--d:.4s"/>
+      <path class="b2" pathLength="1" d="M100 100 C88 90 78 84 70 68" style="--d:.6s"/>
+      <path class="b2" pathLength="1" d="M100 96 C112 86 124 78 130 62" style="--d:.65s"/>
+      <path class="b2" pathLength="1" d="M62 112 C54 110 48 106 40 98" style="--d:.55s"/>
+      <path class="b2" pathLength="1" d="M62 112 C60 100 56 92 54 82" style="--d:.6s"/>
+      <path class="b2" pathLength="1" d="M138 104 C146 100 152 94 160 86" style="--d:.6s"/>
+      <path class="b2" pathLength="1" d="M138 104 C140 94 142 86 144 76" style="--d:.65s"/>
+      <path class="b2" pathLength="1" d="M100 56 C96 48 94 42 92 34" style="--d:.75s"/>
+      <path class="b2" pathLength="1" d="M100 56 C104 48 106 42 110 36" style="--d:.8s"/>
+      <circle cx="70" cy="68" r="3.6" style="--d:.05s"/><circle cx="130" cy="62" r="3.6" style="--d:.1s"/>
+      <circle cx="40" cy="98" r="3.6" style="--d:.15s"/><circle cx="54" cy="82" r="3.6" style="--d:.2s"/>
+      <circle cx="160" cy="86" r="3.6" style="--d:.25s"/><circle cx="144" cy="76" r="3.6" style="--d:.3s"/>
+      <circle cx="92" cy="34" r="3.6" style="--d:.35s"/><circle cx="110" cy="36" r="3.6" style="--d:.4s"/>
+    </svg>
+  </div>
+</section>
+
+<div id="portal" hidden>
+  <header class="bar"><div>
+    <button type="button" class="back" id="back" aria-label="Back to previous page" title="Back">&larr;</button>
+    <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#fff"/><path d="M8 33a14 14 0 0 1 28 0z" fill="#006a4e"/><path d="M22 33V20M22 28l-5-5M22 25l5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+    <div><strong>Safe Land</strong><span>Participant and officer portal</span></div>
+  </div></header>
+
+  <main class="wrap">
+    <div id="flash" class="flash" role="status" hidden></div>
+
+    <section data-v="choose" hidden>
+      <h1 class="ph">Select login type</h1>
+      <p class="sub">Choose how you want to sign in.</p>
+      <div class="pick">
+        <button class="opt" type="button" data-go="user"><b>User login</b><span>For hackathon participants</span></button>
+        <button class="opt" type="button" data-go="corp"><b>Corporate officer login</b><span>For organisation and sponsor officers</span></button>
+      </div>
+    </section>
+
+    <section data-v="user" class="card" hidden>
+      <h1>User login</h1>
+      <form id="fUser" class="body" novalidate>
+        <label>ID (NID number)<input id="uId" inputmode="numeric" autocomplete="username"></label>
+        <label>Password<input id="uPw" type="password" autocomplete="current-password"></label>
+        <p class="err" role="alert"></p>
+        <button class="btn">Log in</button>
+        <p class="links"><button type="button" class="lnk" data-go="signup">Create account</button><button type="button" class="lnk" data-go="forgot">Forgot password?</button></p>
+      </form>
+    </section>
+
+    <section data-v="signup" class="card" hidden>
+      <h1>Create account</h1>
+      <form id="fSign" class="body" novalidate>
+        <label>First name<input id="sF" autocomplete="given-name"></label>
+        <label>Last name<input id="sL" autocomplete="family-name"></label>
+        <label>NID card number<input id="sN" inputmode="numeric"></label>
+        <label>Phone number<input id="sP" type="tel" autocomplete="tel"></label>
+        <label>Password (at least 8 characters)<input id="sW" type="password" autocomplete="new-password"></label>
+        <label>Confirm password<input id="sW2" type="password" autocomplete="new-password"></label>
+        <p class="err" role="alert"></p>
+        <button class="btn">Send OTP</button>
+      </form>
+    </section>
+
+    <section data-v="corp" class="card" hidden>
+      <h1>Corporate login</h1>
+      <form id="fCorp" class="body" novalidate>
+        <label>ID<input id="cId" autocomplete="username"></label>
+        <label>Password<input id="cPw" type="password" autocomplete="current-password"></label>
+        <p class="err" role="alert"></p>
+        <button class="btn">Log in</button>
+      </form>
+    </section>
+
+    <section data-v="otp" class="card" hidden>
+      <h1>OTP verification</h1>
+      <form id="fOtp" class="body" novalidate>
+        <p id="otpMsg"></p>
+        <label>Enter OTP<input id="otp" inputmode="numeric" maxlength="4" autocomplete="one-time-code"></label>
+        <p class="err" role="alert"></p>
+        <button class="btn">Verify</button>
+        <p class="links"><button type="button" class="lnk" id="resend">Resend OTP</button></p>
+      </form>
+    </section>
+
+    <section data-v="forgot" class="card" hidden>
+      <h1>Forgot password</h1>
+      <form id="fForgot" class="body" novalidate>
+        <label>ID<input id="fId"></label>
+        <label>Last name<input id="fLn"></label>
+        <p class="err" role="alert"></p>
+        <button class="btn">Send OTP</button>
+      </form>
+    </section>
+
+    <section data-v="reset" class="card" hidden>
+      <h1>Set new password</h1>
+      <form id="fReset" class="body" novalidate>
+        <label>New password (at least 8 characters)<input id="rW" type="password" autocomplete="new-password"></label>
+        <label>Confirm new password<input id="rW2" type="password" autocomplete="new-password"></label>
+        <p class="err" role="alert"></p>
+        <button class="btn">Save password</button>
+      </form>
+    </section>
+
+    <section data-v="welcome" class="card" hidden>
+      <h1>Signed in</h1>
+      <div class="body">
+        <p>Welcome, <strong id="wName"></strong>.</p>
+        <p class="sub" id="wRole"></p>
+        <button type="button" class="btn" data-go="choose">Log out</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">Safe Land portal</footer>
+</div>
+
+<script src="storage.js"></script>
+<script src="index.js"></script>
+</body>
+</html>
