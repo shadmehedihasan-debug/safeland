@@ -10,6 +10,9 @@ const LantStore = (() => {
   db.corp = db.corp || {};
   db.log = db.log || [];
   db.otp = db.otp || '5696';
+  db.lands = db.lands || {};
+  db.guard = db.guard || {};
+  db.reports = db.reports || [];
   db.plots = db.plots || {
     '512': { place: 'Daag #512, Savar', owner: 'Rahim Uddin', buyer: '', state: 'ACTIVE_VERIFIED', history: [] },
     '204': { place: 'Daag #204, Dhamrai', owner: 'Salma Begum', buyer: 'Karim Traders', state: 'TEMPORARY_ESCROW_LOCK', history: [] },
@@ -51,6 +54,20 @@ const LantStore = (() => {
     corp: id => db.corp[id],
     checkOtp: code => code === db.otp,
     plots: () => db.plots,
+    lands(nid) {
+      if (!db.lands[nid]) {
+        db.lands[nid] = [
+          { place: 'Plot #402, Baipail, Savar', area: 18.2, tax: 'Cleared' },
+          { place: 'Plot #88, Sonargaon, Narayanganj', area: 12.0, tax: 'Cleared' }
+        ];
+        save();
+      }
+      return db.lands[nid];
+    },
+    addLand(nid, parcel) { this.lands(nid).push(parcel); log('land linked', nid, true); },
+    guard: nid => db.guard[nid] !== false,
+    setGuard(nid, on) { db.guard[nid] = on; log(on ? 'guard on' : 'guard off', nid, true); },
+    addReport(r) { db.reports.push(r); if (db.reports.length > 200) db.reports.shift(); log('report filed', 'anonymous', true); },
     lockPlot(id, buyer) {
       const p = db.plots[id];
       p.state = 'TEMPORARY_ESCROW_LOCK'; p.buyer = buyer;

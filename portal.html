@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Safe Land | Citizen portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="portal.css">
+</head>
+<body>
+<header>
+  <div class="topbar"><div>
+    <button type="button" class="back" id="back" aria-label="Back to previous page" title="Back">&larr;</button>
+    <button type="button" class="menu" id="menu" aria-expanded="false">Menu</button>
+    <div class="right"><span id="who"></span><button type="button" class="out" id="out">Log out</button></div>
+  </div></div>
+  <div class="brand">
+    <svg viewBox="0 0 200 100" role="img" aria-label="Safe Land tree">
+      <path d="M0 100A100 100 0 0 1 200 100Z" fill="#12372a"/>
+      <svg x="58" y="16" width="84" height="84" viewBox="0 0 200 200" fill="none" stroke="#f4f1e8" stroke-linecap="round">
+        <path stroke-width="5" d="M100 200V118"/>
+        <path stroke-width="3.2" d="M100 150C100 135 80 128 62 112M100 140C100 128 120 122 138 104M100 118C100 100 100 80 100 56"/>
+        <path stroke-width="2.2" d="M100 100C88 90 78 84 70 68M100 96C112 86 124 78 130 62M62 112C54 110 48 106 40 98M62 112C60 100 56 92 54 82M138 104C146 100 152 94 160 86M138 104C140 94 142 86 144 76M100 56C96 48 94 42 92 34M100 56C104 48 106 42 110 36"/>
+        <g fill="#f2b134" stroke="none"><circle cx="70" cy="68" r="4"/><circle cx="130" cy="62" r="4"/><circle cx="40" cy="98" r="4"/><circle cx="54" cy="82" r="4"/><circle cx="160" cy="86" r="4"/><circle cx="144" cy="76" r="4"/><circle cx="92" cy="34" r="4"/><circle cx="110" cy="36" r="4"/></g>
+      </svg>
+    </svg>
+    <div><h1>Safe Land</h1><p>Citizen portal</p></div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="side" id="side" aria-label="Portal sections">
+    <button type="button" data-t="vault">My Land Vault</button>
+    <button type="button" data-t="check">Land Check</button>
+    <button type="button" data-t="fee">Tax &amp; Fee Calculator</button>
+    <button type="button" data-t="faraiz">Family Land Distributor</button>
+    <button type="button" data-t="report">Report Digging</button>
+  </nav>
+
+  <main class="main">
+    <section data-p="vault">
+      <h1 class="ph">My Land Vault</h1>
+      <p class="sub">Every land parcel registered under your NID. These are sample records.</p>
+      <h2 id="vTitle"></h2>
+      <div id="parcels"></div>
+      <h2>Total land holding</h2>
+      <div class="box">
+        <p><b id="total"></b></p>
+        <div class="meter"><i id="bar"></i></div>
+        <p class="sub" id="pct"></p>
+        <p class="sub">Statutory family ceiling: 60 bighas, counted here as 1,980 decimals (1 bigha = 33 decimals). Bigha size varies by region.</p>
+      </div>
+      <h2>Active anti-theft guard</h2>
+      <div class="box">
+        <label class="chk"><input type="checkbox" id="guard"> Active anti-theft guard</label>
+        <p class="sub" id="gTxt"></p>
+        <button type="button" class="btn ghost sm" id="gTest">Test: someone applies for e-Mutation on my land</button>
+        <div id="gLog"></div>
+      </div>
+      <h2>Link another parcel</h2>
+      <form class="box" id="fLand" novalidate>
+        <div class="fg">
+          <label>District<input id="lD"></label><label>Upazila<input id="lU"></label><label>Mouza<input id="lM"></label>
+          <label>Daag (plot) no.<input id="lDaag"></label><label>Khatian no.<input id="lK"></label>
+          <label>Area (Shotok)<input id="lA" inputmode="decimal"></label>
+        </div>
+        <p class="msg" id="lMsg" role="status"></p>
+        <button class="btn">Link parcel</button>
+      </form>
+    </section>
+
+    <section data-p="check" hidden>
+      <h1 class="ph">Land Check</h1>
+      <p class="sub">Check a plot before you buy it.</p>
+      <form class="box" id="fCheck" novalidate>
+        <div class="fg">
+          <label>District<input id="cD"></label><label>Upazila<input id="cU"></label><label>Mouza<input id="cM"></label>
+          <label>Daag (plot) no.<input id="cDaag"></label><label>Khatian no.<input id="cK"></label>
+        </div>
+        <p class="msg bad" id="cMsg" role="alert"></p>
+        <button class="btn">Check land</button>
+      </form>
+      <div id="cRes"></div>
+    </section>
+
+    <section data-p="fee" hidden>
+      <h1 class="ph">Tax &amp; Fee Calculator</h1>
+      <p class="sub">See the exact government fees before you pay. Pay only through the official channels below, never through a middleman.</p>
+      <form class="box" id="fFee" novalidate>
+        <div class="fg">
+          <label>Upazila<input id="fU"></label>
+          <label>Land area<input id="fA" inputmode="decimal"></label>
+          <label>Area unit<select id="fUn"><option value="decimal">Decimals (Shotok)</option><option value="katha">Katha</option></select></label>
+          <label>Deed transfer value (BDT)<input id="fV" inputmode="decimal"></label>
+          <label>AIT rate % (only if your sub-registry applies one)<input id="fAit" inputmode="decimal" placeholder="0"></label>
+        </div>
+        <p class="msg bad" id="fMsg" role="alert"></p>
+        <button class="btn">Calculate</button>
+      </form>
+      <div id="fRes"></div>
+    </section>
+
+    <section data-p="faraiz" hidden>
+      <h1 class="ph">Family Land Distributor</h1>
+      <p class="sub">Exact legal shares of a family land estate under Islamic inheritance rules (Faraiz), as exact fractions with no rounding errors.</p>
+      <form class="box" id="fFar" novalidate>
+        <div class="fg">
+          <label>Name of the deceased<input id="aN"></label>
+          <label>The deceased was<select id="aS"><option value="m">Male</option><option value="f">Female</option></select></label>
+          <label>Total land estate (decimals)<input id="aE" inputmode="decimal"></label>
+          <label><span id="spLbl">Number of wives (0 to 4)</span><input id="aSp" type="number" min="0" max="4" value="0"></label>
+          <label>Sons<input id="aSo" type="number" min="0" value="0"></label>
+          <label>Daughters<input id="aDa" type="number" min="0" value="0"></label>
+          <label class="chk"><input type="checkbox" id="aMo"> Mother is alive</label>
+          <label class="chk"><input type="checkbox" id="aFa"> Father is alive</label>
+        </div>
+        <p class="msg bad" id="aMsg" role="alert"></p>
+        <button class="btn">Calculate shares</button>
+      </form>
+      <div id="faRes"></div>
+    </section>
+
+    <section data-p="report" hidden>
+      <h1 class="ph">Report Digging</h1>
+      <p class="sub">Report illegal night sand dredging or topsoil stripping. Your report is anonymous: your name and NID are not attached to it.</p>
+      <form class="box" id="fRep" novalidate>
+        <div class="fg">
+          <label>What are you reporting<select id="rKind"><option>Night sand dredging</option><option>Topsoil stripping</option></select></label>
+          <label>Photo of the violation (excavator, dump truck or dredging barge)<input type="file" accept="image/*" capture="environment" id="rPhoto"></label>
+          <label>Nearest mouza (only needed if GPS is blocked)<select id="rPlace"><option value="">Use my GPS</option></select></label>
+          <label>Short note (optional)<input id="rNote" maxlength="200"></label>
+        </div>
+        <div id="rPrev"></div>
+        <p class="msg bad" id="rMsg" role="alert"></p>
+        <button class="btn">Submit anonymous report</button>
+      </form>
+      <div id="rRes"></div>
+    </section>
+  </main>
+</div>
+<footer class="foot">Safe Land citizen portal. Land records, checks and tickets shown here are sample data.</footer>
+
+<script src="storage.js"></script>
+<script src="portal.js"></script>
+</body>
+</html>

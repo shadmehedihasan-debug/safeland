@@ -26,7 +26,7 @@ $('#resend').onclick=()=>{err($('#fOtp'),'');$('#otpMsg').textContent='A new OTP
 $('#fUser').onsubmit=async e=>{e.preventDefault();
   const id=$('#uId').value.trim(),u=S.user(id);
   if(!u||u.h!==await S.hash(id,$('#uPw').value)){S.log('user login',id,false);return err(e.target,'ID or password is incorrect.')}
-  askOtp(u.phone,()=>{S.log('user login',id,true);welcome(u.first+' '+u.last,'User account')},'user');
+  askOtp(u.phone,()=>{S.log('user login',id,true);S.setSession('user',id,u.first+' '+u.last);location.href='portal.html'},'user');
 };
 $('#fCorp').onsubmit=async e=>{e.preventDefault();
   const id=$('#cId').value.trim(),u=S.corp(id);
