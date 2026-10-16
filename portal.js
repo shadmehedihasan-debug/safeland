@@ -41,12 +41,24 @@ $('#gTest').onclick=()=>{
   gl.unshift(`<b>${now()}</b><br>Someone has started an e-Mutation application on ${esc(p.place)}. An SMS and a call were sent to ${mask(me.phone||'')}. If this is not you, contact the AC (Land) office.`);
   S.log('guard alert',me.id,true);drawVault();
 };
-$('#fLand').onsubmit=e=>{e.preventDefault();
-  const g=i=>$(i).value.trim(),d=g('#lD'),u=g('#lU'),m=g('#lM'),dg=g('#lDaag'),k=g('#lK'),a=+g('#lA');
-  if(!d||!u||!m||!dg||!k||!(a>0))return say('#lMsg','Fill in every field. The area must be greater than zero.',1);
-  S.addLand(me.id,{place:`Plot #${dg}, ${m}, ${u}`,district:d,khatian:k,area:a,tax:'Cleared'});
-  e.target.reset();say('#lMsg','Parcel linked to your vault.');drawVault();
+/* Link another parcel: goes under verification first, then is added only if it matches the land records */
+const pend=[],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function drawVer(){
+  $('#verif').innerHTML=pend.length?pend.map(q=>`<div class="row"><b>Plot #${esc(q.daag)}, ${esc(q.mouza)}, ${esc(q.upazila)} (Khatian ${esc(q.khatian)})</b><span class="badge b-l">Checking</span><span class="sub">Matching with the land records...</span></div>`).join(''):'<p class="sub">Nothing is waiting for verification.</p>';
+}
+$('#fLand').onsubmit=async e=>{e.preventDefault();
+  const g=i=>$(i).value.trim(),q={district:g('#lD'),upazila:g('#lU'),mouza:g('#lM'),daag:g('#lDaag'),khatian:g('#lK')};
+  if(Object.values(q).some(x=>!x))return say('#lMsg','Fill in every field.',1);
+  e.target.reset();say('#lMsg','');pend.push(q);drawVer();
+  let r=null;
+  try{[r]=await Promise.all([S.verifyParcel(me.id,q),sleep(1500)])}catch(x){}
+  pend.splice(pend.indexOf(q),1);drawVer();
+  if(!r)say('#lMsg','Could not reach the database. Try again.',1);
+  else if(r.result==='verified'){say('#lMsg','Verified. The parcel was added to your vault.');drawVault()}
+  else if(r.result==='linked')say('#lMsg','This parcel is already in your vault.');
+  else say('#lMsg','Access denied. These details do not match the land records for your NID. The parcel was not added.',1);
 };
+drawVer();
 drawVault();
 
 /* 2. Land Check (sample result: no real land records are connected) */

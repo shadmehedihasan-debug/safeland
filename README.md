@@ -23,7 +23,7 @@ index.html (intro) -> Enter portal -> login type page
 
 | Tab | What it does |
 |---|---|
-| E-Registration | The escrow and temporary lock engine. Plots move through `ACTIVE_VERIFIED`, `TEMPORARY_ESCROW_LOCK` and `PERMANENT_RECORD_UPDATED`. Officers can register a deed (locks the plot) and complete e-Mutation (releases the lock and transfers ownership). Each plot keeps a history. |
+| E-Registration | The escrow and temporary lock engine. Plots move through `ACTIVE_VERIFIED`, `TEMPORARY_ESCROW_LOCK` and `PERMANENT_RECORD_UPDATED`. Officers register a deed, which saves a draft and locks the plot. When the same plot is selected again, its draft page appears, and the officer completes e-Mutation from it (releases the lock and transfers ownership). Each plot keeps a history. |
 | Topsoil Scan | A real map (satellite or street view) with flagged plots and alert cards. Marker and card are linked, and "Dispatch inspection" updates both. |
 | River Inspection | A real map of the Meghna River near Meghna Bridge with a legal Balu Mahal zone and simulated boats. A boat is amber within 20 m of the zone line and red more than 20 m outside it. Pumping during the banned hours (6 pm to 6 am, Bangladesh time) also raises an alert. Alerts move from New to Acknowledged to Patrol dispatched. |
 
@@ -31,7 +31,7 @@ index.html (intro) -> Enter portal -> login type page
 
 | Heading | What it does |
 |---|---|
-| My Land Vault | Lists the user's parcels, totals them against the 60-bigha ceiling (counted as 1,980 decimals), and has an anti-theft guard toggle with a test alert. Users can link another parcel. |
+| My Land Vault | Lists the user's parcels, totals them against the 60-bigha ceiling (counted as 1,980 decimals), and has an anti-theft guard toggle with a test alert. A parcel the user tries to link goes under verification first. It is added only if it matches the land records registered to the user's NID. Otherwise the user sees Access denied and nothing is added. |
 | Land Check | Takes district, upazila, mouza, daag and khatian. Returns a 0 to 100 score (Safe, Caution or High Risk) and four checks: ownership continuity, sub-registry lock, litigation and zoning. Daag numbers that match the corporate sample plots use their real lock state. |
 | Tax & Fee Calculator | Shows the fixed e-Mutation fee (BDT 1,170) and the percentage registration costs, plus economic codes for direct payment. |
 | Family Land Distributor | Computes Islamic inheritance shares as exact fractions, including the cases where shares are reduced or the remainder is returned. It can download a Warishan Buntonnama summary. |
@@ -53,13 +53,15 @@ The E-Registration tab has a **Reset demo plots** button that puts the sample pl
 | `storage.js` | All saved data: accounts, the OTP, plots, parcels, reports, the login history and the session. Loaded by all three pages. Uses the online database when `config.js` has one, and the browser otherwise. |
 | `config.js` | The two database settings (URL and public key). Empty means browser-only mode. |
 | `supabase-setup.sql` | A one-time script that creates the online database tables and functions, with dummy data. |
+| `supabase-drafts.sql` | Adds the saved draft registrations used by E-Registration. |
+| `supabase-verification.sql` | Adds the land records and the parcel verification check used by the Land Vault. |
 
 ## Setting up the online database (optional)
 
 Without a database, accounts exist only in the browser where they were created. With one, the same ID and password work on any device.
 
 1. Create a free project at [supabase.com](https://supabase.com).
-2. In the dashboard, open **SQL Editor**, paste all of `supabase-setup.sql` and press **Run**.
+2. In the dashboard, open **SQL Editor**. Paste and run these three files, one at a time and in this order: `supabase-setup.sql`, then `supabase-drafts.sql`, then `supabase-verification.sql`. Do not run `supabase-setup.sql` again afterwards, because it would replace the newer functions.
 3. Open **Project Settings > API**. Copy the **Project URL** and the **anon public** key.
 4. Paste them into `config.js`. Never paste the `service_role` key anywhere.
 5. Redeploy the site.

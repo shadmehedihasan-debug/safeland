@@ -21,12 +21,16 @@ function drawPlot(){
   const p=cur(),l=locked();
   $('#plotInfo').innerHTML=`<p><span class="badge ${CLS[p.state]}">${p.state}</span></p><p>Titleholder: <b>${esc(p.owner)}</b>${l?'<br>Incoming buyer: <b>'+esc(p.buyer)+'</b>':''}</p><p>Safe to lend or buy: <b>${l?'No, the plot is locked':'Yes'}</b></p>`;
   $('#hist').innerHTML=(p.history||[]).slice().reverse().map(h=>`<li>${esc(new Date(h.at).toLocaleString())}: ${esc(h.m)}</li>`).join('')||'<li>No activity yet.</li>';
+  /* A plot with a saved draft shows the draft page, where e-Mutation is completed */
+  const d=S.draftFor(sel.value)||(l?{id:'not recorded',buyer:p.buyer,by:'',at:null}:null);
+  $('#regForm').hidden=!!d;$('#draftBox').hidden=!d;
+  if(d)$('#draftInfo').innerHTML=`<p>Deed no.: <b>${esc(d.id)}</b></p><p>Buyer: <b>${esc(d.buyer)}</b></p><p>Saved: <b>${d.at?esc(new Date(d.at).toLocaleString()):'not recorded'}</b></p><p>Registered by: <b>${esc(d.by||'not recorded')}</b></p><p class="sub">Status: draft. The plot is locked until e-Mutation is completed.</p>`;
 }
 sel.onchange=()=>{say();drawPlot()};
 $('#bLock').onclick=()=>{
   if(locked())return say('Blocked: this plot is already under a temporary escrow lock.',1);
   const b=$('#buyer').value.trim();if(!b)return say('Enter the buyer name first.',1);
-  S.lockPlot(sel.value,b);$('#buyer').value='';drawPlot();say('Plot locked. A digital notice was sent to the AC (Land) office.');
+  const dn=S.lockPlot(sel.value,b);$('#buyer').value='';drawPlot();say('Deed '+dn+' saved as a draft and the plot is locked. A digital notice was sent to the AC (Land) office. Select this plot again to complete e-Mutation.');
 };
 $('#bMut').onclick=()=>{
   if(!locked())return say('Nothing to complete. This plot has no pending deed.',1);

@@ -44,10 +44,16 @@
   <div class="box">
     <label>Plot<select id="plotSel"></select></label>
     <div id="plotInfo"></div>
-    <label>Buyer name (for a new deed)<input id="buyer" autocomplete="off"></label>
+    <div id="regForm">
+      <label>Buyer name (for a new deed)<input id="buyer" autocomplete="off"></label>
+      <div class="btns"><button type="button" class="btn" id="bLock">Register deed and lock plot</button></div>
+    </div>
+    <div id="draftBox" class="box" hidden>
+      <h3 style="margin:0 0 8px;color:var(--deep)">Draft registration</h3>
+      <div id="draftInfo"></div>
+      <div class="btns"><button type="button" class="btn" id="bMut">Complete e-Mutation</button></div>
+    </div>
     <div class="btns">
-      <button type="button" class="btn" id="bLock">Register deed and lock plot</button>
-      <button type="button" class="btn" id="bMut">Complete e-Mutation</button>
       <button type="button" class="btn ghost" id="bTry">Try a new sale or mortgage</button>
       <button type="button" class="btn ghost" id="bReset">Reset demo plots</button>
     </div>

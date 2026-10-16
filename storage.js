@@ -21,12 +21,23 @@ const LantStore = (() => {
     { place: 'Plot #88, Sonargaon, Narayanganj', area: 12.0, tax: 'Cleared' }
   ];
 
+  const sampleDrafts = () => ({
+    '204': { id: 'DEED-000204', buyer: 'Karim Traders', by: 'DEMO-OFFICER', at: new Date().toISOString() }
+  });
+  /* Dummy land records used to verify a parcel a citizen tries to link */
+  const sampleRecords = () => [
+    { nid: '1234567890123', district: 'Dhaka', upazila: 'Savar', mouza: 'Ashulia', daag: '1187', khatian: '3302', area: 6.4, tax: 'Cleared' },
+    { nid: '0000000000001', district: 'Dhaka', upazila: 'Savar', mouza: 'Hemayetpur', daag: '77', khatian: '1450', area: 4.2, tax: 'Cleared' }
+  ];
+
   let db = { users: {}, corp: {}, log: [], otp: '5696' };
   try { const s = localStorage.getItem(KEY); if (s) db = JSON.parse(s); } catch (e) {}
   db.users = db.users || {}; db.corp = db.corp || {}; db.log = db.log || [];
   db.otp = db.otp || '5696';
   db.plots = db.plots || samplePlots();
   db.lands = db.lands || {}; db.guard = db.guard || {}; db.reports = db.reports || [];
+  db.drafts = db.drafts || sampleDrafts();
+  db.records = db.records || sampleRecords();
 
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} };
   const hash = async (id, pw) => {
@@ -113,36 +124,63 @@ const LantStore = (() => {
         if (!r) return;
         if (r.plots && Object.keys(r.plots).length) db.plots = r.plots;
         if (s.role === 'user') { db.lands[s.id] = r.lands || []; db.guard[s.id] = r.guard !== false; }
+        if (s.role === 'corp') { try { const d = await rpc('lt_load_drafts', { p_token: s.token }); if (d) db.drafts = d; } catch (e) {} }
         save();
       } catch (e) {}
     },
 
     /* Plots (E-Registration) */
     plots: () => db.plots,
+    /* Drafts: registering a deed saves a draft and locks the plot. Completing e-Mutation clears it. */
+    draftFor: id => db.drafts[id] || null,
     lockPlot(id, buyer) {
-      const p = db.plots[id];
+      const p = db.plots[id], s = session();
+      const deed = 'DEED-' + Math.random().toString(36).slice(2, 8).toUpperCase();
       p.state = 'TEMPORARY_ESCROW_LOCK'; p.buyer = buyer;
-      (p.history = p.history || []).push({ at: new Date().toISOString(), m: 'Deed registered for ' + buyer + '. Plot locked.' });
+      db.drafts[id] = { id: deed, buyer, by: s ? s.id : '', at: new Date().toISOString() };
+      (p.history = p.history || []).push({ at: new Date().toISOString(), m: 'Deed ' + deed + ' registered for ' + buyer + ' and saved as a draft. Plot locked.' });
       log('plot locked', id, true);
-      push('lt_plot_lock', { p_id: id, p_buyer: buyer });
+      if (CLOUD && s && s.token) {
+        rpc('lt_plot_lock', { p_token: s.token, p_id: id, p_buyer: buyer, p_deed: deed })
+          .catch(() => rpc('lt_plot_lock', { p_token: s.token, p_id: id, p_buyer: buyer }).catch(() => {}));
+      }
+      return deed;
     },
     completeMutation(id) {
       const p = db.plots[id], b = p.buyer;
       p.owner = b; p.buyer = ''; p.state = 'PERMANENT_RECORD_UPDATED';
+      delete db.drafts[id];
       (p.history = p.history || []).push({ at: new Date().toISOString(), m: 'e-Mutation completed. ' + b + ' is the permanent titleholder.' });
       log('mutation completed', id, true);
       push('lt_plot_complete', { p_id: id });
     },
-    resetPlots() { db.plots = samplePlots(); save(); push('lt_reset_plots', {}); },
+    resetPlots() { db.plots = samplePlots(); db.drafts = sampleDrafts(); save(); push('lt_reset_plots', {}); },
 
     /* Citizen portal */
     lands(nid) {
       if (!db.lands[nid]) { db.lands[nid] = sampleLands(); save(); }
       return db.lands[nid];
     },
-    addLand(nid, p) {
-      this.lands(nid).push(p); log('land linked', nid, true);
-      push('lt_add_land', { p_place: p.place, p_district: p.district || '', p_khatian: p.khatian || '', p_area: p.area });
+    /* A parcel is added only if it matches a land record owned by this NID.
+       Returns { result: 'verified' | 'denied' | 'linked', place, area, tax }. */
+    async verifyParcel(nid, q) {
+      if (CLOUD) {
+        const s = session();
+        const r = await rpc('lt_verify_parcel', { p_token: s.token, p_district: q.district, p_upazila: q.upazila, p_mouza: q.mouza, p_daag: q.daag, p_khatian: q.khatian });
+        if (r && r.result === 'verified') {
+          this.lands(nid).push({ place: r.place, district: q.district, khatian: q.khatian, area: +r.area, tax: r.tax });
+          save();
+        }
+        return r || { result: 'denied' };
+      }
+      const k = x => String(x || '').trim().toLowerCase();
+      const rec = db.records.find(r => r.nid === nid && ['district', 'upazila', 'mouza', 'daag', 'khatian'].every(f => k(r[f]) === k(q[f])));
+      if (!rec) { log('parcel denied', nid, false); return { result: 'denied' }; }
+      const place = 'Plot #' + rec.daag + ', ' + rec.mouza + ', ' + rec.upazila;
+      if (this.lands(nid).some(p => k(p.place) === k(place))) return { result: 'linked' };
+      this.lands(nid).push({ place, district: rec.district, khatian: rec.khatian, area: rec.area, tax: rec.tax });
+      log('parcel verified', nid, true);
+      return { result: 'verified', place, area: rec.area, tax: rec.tax };
     },
     guard: nid => db.guard[nid] !== false,
     setGuard(nid, on) { db.guard[nid] = on; log(on ? 'guard on' : 'guard off', nid, true); push('lt_set_guard', { p_on: on }); },
