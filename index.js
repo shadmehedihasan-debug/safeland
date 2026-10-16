@@ -23,15 +23,20 @@ const parent={choose:'intro',user:'choose',signup:'user',corp:'choose',forgot:'u
 $('#back').onclick=()=>{const v=cur==='otp'?otpBack:parent[cur];v==='intro'?showIntro():show(v)};
 $('#resend').onclick=()=>{err($('#fOtp'),'');$('#otpMsg').textContent='A new OTP has been sent to '+mask(ctx.phone)+'.'};
 
+const net=f=>err(f,'Could not reach the database. Check your connection and try again.');
+const busy=(f,on)=>{const b=f.querySelector('.btn');if(b)b.disabled=!!on};
+
 $('#fUser').onsubmit=async e=>{e.preventDefault();
-  const id=$('#uId').value.trim(),u=S.user(id);
-  if(!u||u.h!==await S.hash(id,$('#uPw').value)){S.log('user login',id,false);return err(e.target,'ID or password is incorrect.')}
-  askOtp(u.phone,()=>{S.log('user login',id,true);S.setSession('user',id,u.first+' '+u.last);location.href='portal.html'},'user');
+  const f=e.target,id=$('#uId').value.trim();let u;
+  busy(f,1);try{u=await S.login('user',id,$('#uPw').value)}catch(x){busy(f,0);return net(f)}busy(f,0);
+  if(!u)return err(f,'ID or password is incorrect.');
+  askOtp(u.phone,()=>{S.log('user login',id,true);S.setSession('user',id,u.name,u.token,u.phone);location.href='portal.html'},'user');
 };
 $('#fCorp').onsubmit=async e=>{e.preventDefault();
-  const id=$('#cId').value.trim(),u=S.corp(id);
-  if(!u||u.h!==await S.hash(id,$('#cPw').value)){S.log('corporate login',id,false);return err(e.target,'ID or password is incorrect.')}
-  askOtp(u.phone,()=>{S.log('corporate login',id,true);S.setSession('corp',id,u.name);location.href='corporate.html'},'corp');
+  const f=e.target,id=$('#cId').value.trim();let u;
+  busy(f,1);try{u=await S.login('corp',id,$('#cPw').value)}catch(x){busy(f,0);return net(f)}busy(f,0);
+  if(!u)return err(f,'ID or password is incorrect.');
+  askOtp(u.phone,()=>{S.log('corporate login',id,true);S.setSession('corp',id,u.name,u.token,u.phone);location.href='corporate.html'},'corp');
 };
 $('#fSign').onsubmit=e=>{e.preventDefault();
   const g=i=>$(i).value.trim(),f=e.target,first=g('#sF'),last=g('#sL'),nid=g('#sN'),ph=g('#sP'),pw=$('#sW').value,pw2=$('#sW2').value;
@@ -40,9 +45,9 @@ $('#fSign').onsubmit=e=>{e.preventDefault();
   if(!/^\+?\d{10,15}$/.test(ph))return err(f,'Enter a valid phone number.');
   if(pw.length<8)return err(f,'Password must be at least 8 characters.');
   if(pw!==pw2)return err(f,'Passwords do not match.');
-  if(S.user(nid))return err(f,'An account with this NID number already exists.');
   askOtp(ph,async()=>{
-    await S.addUser(nid,{first,last,phone:ph,pw});
+    let ok;try{ok=await S.register(nid,{first,last,phone:ph,pw})}catch(x){show('signup');return net(f)}
+    if(!ok){show('signup');return err(f,'An account with this NID number already exists.')}
     flashMsg='Account created. Log in with your NID number and password.';
     f.reset();showIntro();
   },'signup');
@@ -51,18 +56,25 @@ $('#fOtp').onsubmit=e=>{e.preventDefault();
   if(!S.checkOtp($('#otp').value.trim()))return err(e.target,'Incorrect OTP. Please try again.');
   otpOk();
 };
-$('#fForgot').onsubmit=e=>{e.preventDefault();
-  const id=$('#fId').value.trim(),u=S.user(id);
-  if(!u||u.last.toLowerCase()!==$('#fLn').value.trim().toLowerCase())return err(e.target,'ID and last name do not match our records.');
-  ctx.tid=id;askOtp(u.phone,()=>show('reset'),'forgot');
+$('#fForgot').onsubmit=async e=>{e.preventDefault();
+  const f=e.target,id=$('#fId').value.trim(),ln=$('#fLn').value.trim();let ph;
+  try{ph=await S.forgot(id,ln)}catch(x){return net(f)}
+  if(!ph)return err(f,'ID and last name do not match our records.');
+  ctx.tid=id;ctx.last=ln;askOtp(ph,()=>show('reset'),'forgot');
 };
 $('#fReset').onsubmit=async e=>{e.preventDefault();
-  const p=$('#rW').value,p2=$('#rW2').value;
-  if(p.length<8)return err(e.target,'Password must be at least 8 characters.');
-  if(p!==p2)return err(e.target,'Passwords do not match.');
-  await S.setPassword(ctx.tid,p);
+  const f=e.target,p=$('#rW').value,p2=$('#rW2').value;let ok;
+  if(p.length<8)return err(f,'Password must be at least 8 characters.');
+  if(p!==p2)return err(f,'Passwords do not match.');
+  try{ok=await S.reset(ctx.tid,ctx.last,p)}catch(x){return net(f)}
+  if(!ok)return err(f,'The password could not be updated. Go back and try again.');
   flashMsg='Password updated. Log in with your new password.';
-  e.target.reset();show('user');
+  f.reset();show('user');
 };
+$$('[data-demo]').forEach(b=>b.onclick=async()=>{
+  const k=b.dataset.demo,f=b.closest('form');b.disabled=true;
+  try{const r=await S.demoLogin(k);if(!r)throw 0;S.setSession(k,r.id,r.name,r.token,r.phone);location.href=k==='user'?'portal.html':'corporate.html'}
+  catch(x){b.disabled=false;err(f,'The demo could not start. Check your connection and try again.')}
+});
 if(location.hash==='#login')$('#enter').click();
 })();

@@ -1,7 +1,8 @@
-(()=>{
+(async()=>{
 const S=LantStore,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const me=S.session();
 if(!me||me.role!=='corp'){location.replace('index.html');return}
+await S.load();
 $('#off').textContent=me.name;
 const leave=()=>{S.endSession();location.href='index.html#login'};
 $('#back').onclick=leave;$('#out').onclick=leave;
@@ -32,6 +33,7 @@ $('#bMut').onclick=()=>{
   const b=cur().buyer;S.completeMutation(sel.value);drawPlot();say('e-Mutation complete. The lock is released and '+b+' is the permanent titleholder.');
 };
 $('#bTry').onclick=()=>locked()?say('Blocked: no new sale, power of attorney or mortgage can start on a locked plot.',1):say('Allowed: the plot is clean and tradeable.');
+$('#bReset').onclick=()=>{S.resetPlots();drawPlot();say('Demo plots restored to their starting states.')};
 drawPlot();
 
 /* Map helper (Leaflet): satellite and street layers */

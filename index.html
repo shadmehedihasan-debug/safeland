@@ -14,7 +14,7 @@
 <section id="intro">
   <div class="title">
     <h1>Safe Land</h1>
-    <p>Dates and venue coming soon</p>
+    <p>Every plot has a story. We keep it true.</p>
     <button id="enter" type="button">Enter portal</button>
   </div>
   <div class="dome" role="img" aria-label="A tree growing inside a half circle">
@@ -65,6 +65,7 @@
         <label>Password<input id="uPw" type="password" autocomplete="current-password"></label>
         <p class="err" role="alert"></p>
         <button class="btn">Log in</button>
+        <button type="button" class="btn ghost" data-demo="user">Demo as Citizen</button>
         <p class="links"><button type="button" class="lnk" data-go="signup">Create account</button><button type="button" class="lnk" data-go="forgot">Forgot password?</button></p>
       </form>
     </section>
@@ -90,6 +91,7 @@
         <label>Password<input id="cPw" type="password" autocomplete="current-password"></label>
         <p class="err" role="alert"></p>
         <button class="btn">Log in</button>
+        <button type="button" class="btn ghost" data-demo="corp">Demo as Officer</button>
       </form>
     </section>
 
@@ -137,6 +139,7 @@
   <footer class="foot">Safe Land portal</footer>
 </div>
 
+<script src="config.js"></script>
 <script src="storage.js"></script>
 <script src="index.js"></script>
 </body>

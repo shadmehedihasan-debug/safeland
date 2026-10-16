@@ -1,7 +1,8 @@
-(()=>{
+(async()=>{
 const S=LantStore,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const me=S.session();
 if(!me||me.role!=='user'){location.replace('index.html');return}
+await S.load();
 $('#who').textContent='Verified: '+me.name+' | NID: '+me.id;
 const leave=()=>{S.endSession();location.href='index.html#login'};
 $('#back').onclick=leave;$('#out').onclick=leave;
@@ -36,8 +37,8 @@ function drawVault(){
 $('#guard').onchange=e=>{S.setGuard(me.id,e.target.checked);drawVault()};
 $('#gTest').onclick=()=>{
   if(!S.guard(me.id))return say('#gTxt','Turn the guard on first.',1);
-  const L=S.lands(me.id),p=L[Math.floor(Math.random()*L.length)],u=S.user(me.id);
-  gl.unshift(`<b>${now()}</b><br>Someone has started an e-Mutation application on ${esc(p.place)}. An SMS and a call were sent to ${mask(u?u.phone:'')}. If this is not you, contact the AC (Land) office.`);
+  const L=S.lands(me.id),p=L[Math.floor(Math.random()*L.length)];
+  gl.unshift(`<b>${now()}</b><br>Someone has started an e-Mutation application on ${esc(p.place)}. An SMS and a call were sent to ${mask(me.phone||'')}. If this is not you, contact the AC (Land) office.`);
   S.log('guard alert',me.id,true);drawVault();
 };
 $('#fLand').onsubmit=e=>{e.preventDefault();

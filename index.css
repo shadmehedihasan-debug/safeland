@@ -55,3 +55,7 @@ input:focus,button:focus-visible{outline:3px solid var(--gold);outline-offset:1p
 .sub{color:var(--muted);font-size:.9rem}
 
 @media (prefers-reduced-motion:reduce){#intro .title,.dome,.tree path,.tree circle,#enter{animation:none}.dome{transform:none}.tree path{stroke-dashoffset:0}.tree circle{transform:none}#enter{opacity:1}}
+
+.btn.ghost{background:#fff;color:var(--green);border:2px solid var(--green);margin-top:10px}
+.btn.ghost:hover{background:var(--tint)}
+.btn:disabled{opacity:.6;cursor:wait}
