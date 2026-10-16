@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="portal.css">
 </head>
 <body>
@@ -14,7 +15,7 @@
   <div class="topbar"><div>
     <button type="button" class="back" id="back" aria-label="Back to previous page" title="Back">&larr;</button>
     <button type="button" class="menu" id="menu" aria-expanded="false">Menu</button>
-    <div class="right"><span id="who"></span><button type="button" class="out" id="out">Log out</button></div>
+    <div class="right"><button type="button" class="lang" data-lang-toggle></button><span id="who"></span><button type="button" class="out" id="out">Log out</button></div>
   </div></div>
   <div class="brand">
     <svg viewBox="0 0 200 100" role="img" aria-label="Safe Land tree">
@@ -144,6 +145,7 @@
 </div>
 <footer class="foot">Safe Land citizen portal. Land records, checks and tickets shown here are sample data.</footer>
 
+<script src="i18n.js"></script>
 <script src="config.js"></script>
 <script src="storage.js"></script>
 <script src="portal.js"></script>

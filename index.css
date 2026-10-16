@@ -59,3 +59,12 @@ input:focus,button:focus-visible{outline:3px solid var(--gold);outline-offset:1p
 .btn.ghost{background:#fff;color:var(--green);border:2px solid var(--green);margin-top:10px}
 .btn.ghost:hover{background:var(--tint)}
 .btn:disabled{opacity:.6;cursor:wait}
+
+/* Language switch and Bangla */
+:root[lang="bn"]{--font:"Noto Sans Bengali",Arial,sans-serif}
+.lang{background:none;border:2px solid currentColor;color:inherit;border-radius:3px;padding:6px 12px;font-weight:700;font-size:.9rem;cursor:pointer;flex:none;line-height:1.2}
+.lang:hover{background:rgba(255,255,255,.15)}
+.bar .lang{margin-left:auto}
+#intro .lang{position:absolute;top:14px;right:14px;z-index:3;color:var(--deep);background:#fff}
+#intro .lang:hover{background:var(--tint)}
+#intro .title{padding-top:max(56px,clamp(24px,6vh,64px))}

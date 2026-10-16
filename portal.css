@@ -70,3 +70,8 @@ th{background:var(--tint)}
   .brand svg{width:100px}
   .right{font-size:.75rem}
 }
+
+/* Language switch and Bangla */
+:root[lang="bn"]{--font:"Noto Sans Bengali",Arial,sans-serif}
+.lang{background:none;border:2px solid currentColor;color:inherit;border-radius:3px;padding:6px 12px;font-weight:700;font-size:.9rem;cursor:pointer;flex:none;line-height:1.2}
+.lang:hover{background:rgba(255,255,255,.15)}

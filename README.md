@@ -50,11 +50,22 @@ The E-Registration tab has a **Reset demo plots** button that puts the sample pl
 | `index.html`, `index.css`, `index.js` | The intro and the login site |
 | `corporate.html`, `corporate.css`, `corporate.js` | The corporate dashboard |
 | `portal.html`, `portal.css`, `portal.js` | The citizen portal |
+| `i18n.js` | The Bangla and English text and the language switch. Loaded by all three pages. |
 | `storage.js` | All saved data: accounts, the OTP, plots, parcels, reports, the login history and the session. Loaded by all three pages. Uses the online database when `config.js` has one, and the browser otherwise. |
 | `config.js` | The two database settings (URL and public key). Empty means browser-only mode. |
 | `supabase-setup.sql` | A one-time script that creates the online database tables and functions, with dummy data. |
 | `supabase-drafts.sql` | Adds the saved draft registrations used by E-Registration. |
 | `supabase-verification.sql` | Adds the land records and the parcel verification check used by the Land Vault. |
+
+## Languages
+
+The site opens in Bangla. A switch in the top right corner of every page changes the language to English, and the choice is remembered in the browser. Changing the language reloads the page.
+
+Each piece of text is keyed by its English wording in `i18n.js`. To change a Bangla phrase, find the English line in that file and edit the Bangla value next to it. To add a new sentence to the pages, add it to the HTML or to a `TR('...')` call in the script, then add a matching Bangla entry in `i18n.js`.
+
+Data is stored in English. Place names such as Savar or Baipail are shown in Bangla on screen, but the saved records and the matching of parcels keep the English values. Sample people's names are the same in both languages. The state codes such as `ACTIVE_VERIFIED` stay in English as system identifiers. The Safe Land name is not translated.
+
+Legal and government terms (deed, mutation, Khatian, Daag, Warishan and the rest) need review by a Bangla speaker familiar with land records before real use.
 
 ## Setting up the online database (optional)
 
@@ -84,6 +95,7 @@ The site is static and needs no build step.
 |---|---|
 | Text and headings | The page's `.html` file |
 | Colors, spacing and fonts | The page's `.css` file |
+| Bangla and English wording on screen | `i18n.js` (the table is keyed by the English text) |
 | The OTP code, the demo accounts, sample plots and sample parcels | `storage.js` |
 | The database URL and public key | `config.js` |
 | Fee and tax percentages (`RATES`), economic codes, ceiling size | `portal.js` |
@@ -106,6 +118,7 @@ The site is static and needs no build step.
 - **Fee rates need checking.** The portal uses 1.5% stamp duty, 1% registration fee and 2% local government tax. Published guides disagree on these, and a 2026 registration ordinance may have changed them. Confirm the current rates before relying on the calculator. AIT has no default rate.
 - **Economic codes.** Only stamp duty (1162101) and document registration fee (1422201) are filled in. Other codes say to confirm with the office.
 - **Map positions are approximate.** The River Inspection zone and the Topsoil Scan markers are approximations. Replace them with official survey boundaries.
+- **Bangla text needs review.** The translations are a first draft. A native speaker familiar with land records should check them.
 - **Maps need internet.** They load from outside services. If a map cannot load, the page shows a message.
 - **Inheritance output is for reference.** It covers spouse, sons, daughters, mother and father only. Other heirs, such as siblings, are not included. An official Warishan certificate is still required.
 

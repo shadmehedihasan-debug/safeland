@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Safe Land | Corporate dashboard</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="corporate.css">
 </head>
 <body>
@@ -12,7 +13,7 @@
   <button type="button" class="back" id="back" aria-label="Back to previous page" title="Back">&larr;</button>
   <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#fff"/><path d="M8 33a14 14 0 0 1 28 0z" fill="#006a4e"/><path d="M22 33V20M22 28l-5-5M22 25l5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
   <div><strong>Safe Land</strong><span>Corporate dashboard</span></div>
-  <div class="right"><span id="off"></span><button type="button" class="out" id="out">Log out</button></div>
+  <div class="right"><button type="button" class="lang" data-lang-toggle></button><span id="off"></span><button type="button" class="out" id="out">Log out</button></div>
 </div></header>
 
 <nav class="tabs"><div role="tablist">
@@ -99,6 +100,7 @@
 <footer class="foot">Safe Land corporate dashboard. Plots, alerts and positions shown here are sample data. Map positions are approximate.</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="i18n.js"></script>
 <script src="config.js"></script>
 <script src="storage.js"></script>
 <script src="corporate.js"></script>

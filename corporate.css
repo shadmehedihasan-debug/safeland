@@ -56,3 +56,9 @@ ul.hist{margin:6px 0 0;padding-left:20px;font-size:.9rem}
 .alert.sel{outline:3px solid var(--gold)}
 .alert.ok{border-left-color:var(--green)}
 .foot{background:var(--tint);border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;text-align:center;padding:14px 20px}
+
+/* Language switch and Bangla */
+:root[lang="bn"]{--font:"Noto Sans Bengali",Arial,sans-serif}
+:root[lang="bn"] .flow li::before{content:"ধাপ " counter(s)}
+.lang{background:none;border:2px solid currentColor;color:inherit;border-radius:3px;padding:6px 12px;font-weight:700;font-size:.9rem;cursor:pointer;flex:none;line-height:1.2}
+.lang:hover{background:rgba(255,255,255,.15)}

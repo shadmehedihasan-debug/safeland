@@ -1,5 +1,6 @@
 (async()=>{
 const S=LantStore,$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const TR=SafeLang.tr,PL=SafeLang.place;
 const me=S.session();
 if(!me||me.role!=='corp'){location.replace('index.html');return}
 await S.load();
@@ -14,40 +15,40 @@ $$('[data-t]').forEach(b=>b.onclick=()=>tab(b.dataset.t));tab('lock');
 
 /* 1. Escrow lock engine */
 const sel=$('#plotSel'),CLS={ACTIVE_VERIFIED:'b-a',TEMPORARY_ESCROW_LOCK:'b-l',PERMANENT_RECORD_UPDATED:'b-p'};
-sel.innerHTML=Object.entries(S.plots()).map(([k,p])=>`<option value="${esc(k)}">${esc(p.place)}</option>`).join('');
+sel.innerHTML=Object.entries(S.plots()).map(([k,p])=>`<option value="${esc(k)}">${esc(PL(p.place))}</option>`).join('');
 const cur=()=>S.plots()[sel.value],locked=()=>cur().state==='TEMPORARY_ESCROW_LOCK';
 function say(m,bad){const e=$('#plotMsg');e.textContent=m||'';e.className='msg'+(bad?' bad':'')}
 function drawPlot(){
   const p=cur(),l=locked();
-  $('#plotInfo').innerHTML=`<p><span class="badge ${CLS[p.state]}">${p.state}</span></p><p>Titleholder: <b>${esc(p.owner)}</b>${l?'<br>Incoming buyer: <b>'+esc(p.buyer)+'</b>':''}</p><p>Safe to lend or buy: <b>${l?'No, the plot is locked':'Yes'}</b></p>`;
-  $('#hist').innerHTML=(p.history||[]).slice().reverse().map(h=>`<li>${esc(new Date(h.at).toLocaleString())}: ${esc(h.m)}</li>`).join('')||'<li>No activity yet.</li>';
+  $('#plotInfo').innerHTML=`<p><span class="badge ${CLS[p.state]}">${p.state}</span></p><p>${TR('Titleholder:')} <b>${esc(p.owner)}</b>${l?'<br>'+TR('Incoming buyer:')+' <b>'+esc(p.buyer)+'</b>':''}</p><p>${TR('Safe to lend or buy:')} <b>${l?TR('No, the plot is locked'):TR('Yes')}</b></p>`;
+  $('#hist').innerHTML=(p.history||[]).slice().reverse().map(h=>`<li>${esc(new Date(h.at).toLocaleString())}: ${esc(h.m)}</li>`).join('')||`<li>${TR('No activity yet.')}</li>`;
   /* A plot with a saved draft shows the draft page, where e-Mutation is completed */
   const d=S.draftFor(sel.value)||(l?{id:'not recorded',buyer:p.buyer,by:'',at:null}:null);
   $('#regForm').hidden=!!d;$('#draftBox').hidden=!d;
-  if(d)$('#draftInfo').innerHTML=`<p>Deed no.: <b>${esc(d.id)}</b></p><p>Buyer: <b>${esc(d.buyer)}</b></p><p>Saved: <b>${d.at?esc(new Date(d.at).toLocaleString()):'not recorded'}</b></p><p>Registered by: <b>${esc(d.by||'not recorded')}</b></p><p class="sub">Status: draft. The plot is locked until e-Mutation is completed.</p>`;
+  if(d)$('#draftInfo').innerHTML=`<p>${TR('Deed no.:')} <b>${esc(d.id==='not recorded'?TR('not recorded'):d.id)}</b></p><p>${TR('Buyer:')} <b>${esc(d.buyer)}</b></p><p>${TR('Saved:')} <b>${d.at?esc(new Date(d.at).toLocaleString()):TR('not recorded')}</b></p><p>${TR('Registered by:')} <b>${esc(d.by||TR('not recorded'))}</b></p><p class="sub">${TR('Status: draft. The plot is locked until e-Mutation is completed.')}</p>`;
 }
 sel.onchange=()=>{say();drawPlot()};
 $('#bLock').onclick=()=>{
-  if(locked())return say('Blocked: this plot is already under a temporary escrow lock.',1);
-  const b=$('#buyer').value.trim();if(!b)return say('Enter the buyer name first.',1);
-  const dn=S.lockPlot(sel.value,b);$('#buyer').value='';drawPlot();say('Deed '+dn+' saved as a draft and the plot is locked. A digital notice was sent to the AC (Land) office. Select this plot again to complete e-Mutation.');
+  if(locked())return say(TR('Blocked: this plot is already under a temporary escrow lock.'),1);
+  const b=$('#buyer').value.trim();if(!b)return say(TR('Enter the buyer name first.'),1);
+  const dn=S.lockPlot(sel.value,b);$('#buyer').value='';drawPlot();say(TR('Deed {0} saved as a draft and the plot is locked. A digital notice was sent to the AC (Land) office. Select this plot again to complete e-Mutation.',dn));
 };
 $('#bMut').onclick=()=>{
-  if(!locked())return say('Nothing to complete. This plot has no pending deed.',1);
-  const b=cur().buyer;S.completeMutation(sel.value);drawPlot();say('e-Mutation complete. The lock is released and '+b+' is the permanent titleholder.');
+  if(!locked())return say(TR('Nothing to complete. This plot has no pending deed.'),1);
+  const b=cur().buyer;S.completeMutation(sel.value);drawPlot();say(TR('e-Mutation complete. The lock is released and {0} is the permanent titleholder.',b));
 };
-$('#bTry').onclick=()=>locked()?say('Blocked: no new sale, power of attorney or mortgage can start on a locked plot.',1):say('Allowed: the plot is clean and tradeable.');
-$('#bReset').onclick=()=>{S.resetPlots();drawPlot();say('Demo plots restored to their starting states.')};
+$('#bTry').onclick=()=>locked()?say(TR('Blocked: no new sale, power of attorney or mortgage can start on a locked plot.'),1):say(TR('Allowed: the plot is clean and tradeable.'));
+$('#bReset').onclick=()=>{S.resetPlots();drawPlot();say(TR('Demo plots restored to their starting states.'))};
 drawPlot();
 
 /* Map helper (Leaflet): satellite and street layers */
 function mkMap(id){
   const el=$('#'+id);
-  if(typeof L==='undefined'){el.classList.add('off');el.textContent='The map could not load. Check your internet connection and refresh the page.';return null}
+  if(typeof L==='undefined'){el.classList.add('off');el.textContent=TR('The map could not load. Check your internet connection and refresh the page.');return null}
   const m=L.map(id);
   const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:18,attribution:'Tiles &copy; Esri'});
   const st=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap contributors'});
-  sat.addTo(m);L.control.layers({'Satellite':sat,'Street map':st}).addTo(m);
+  sat.addTo(m);L.control.layers({[TR('Satellite')]:sat,[TR('Street map')]:st}).addTo(m);
   return m}
 
 /* 3. Topsoil scan */
@@ -60,14 +61,14 @@ const ag=[
 let agMap=null,agMk=[];
 const agCol=a=>a.done?'#004d38':'#b42318';
 function drawAg(){
-  $('#alerts').innerHTML=ag.map((a,i)=>`<div class="alert${a.done?' ok':''}" data-c="${i}"><b>Daag #${a.plot}, ${a.up}</b><p>Warning: ${a.t}</p><p class="sub">Sent to the Upazila Agriculture Officer and AC (Land)</p>${a.done?'<span class="badge b-p">Inspection dispatched</span>':`<button type="button" class="btn sm" data-i="${i}">Dispatch inspection</button>`}</div>`).join('');
+  $('#alerts').innerHTML=ag.map((a,i)=>`<div class="alert${a.done?' ok':''}" data-c="${i}"><b>${TR('Daag')} #${esc(a.plot)}, ${esc(PL(a.up))}</b><p>${TR('Warning:')} ${TR(a.t)}</p><p class="sub">${TR('Sent to the Upazila Agriculture Officer and AC (Land)')}</p>${a.done?`<span class="badge b-p">${TR('Inspection dispatched')}</span>`:`<button type="button" class="btn sm" data-i="${i}">${TR('Dispatch inspection')}</button>`}</div>`).join('');
   agMk.forEach((m,i)=>m.setStyle({fillColor:agCol(ag[i])}));
 }
 function initAgri(){
   if(agMap)return agMap.invalidateSize();
   agMap=mkMap('agMap');if(!agMap)return;
   agMap.fitBounds(BD);
-  agMk=ag.map((a,i)=>L.circleMarker(a.ll,{radius:10,color:'#fff',weight:2,fillColor:agCol(a),fillOpacity:1}).addTo(agMap).bindTooltip('Daag #'+a.plot+', '+a.up).on('click',()=>{
+  agMk=ag.map((a,i)=>L.circleMarker(a.ll,{radius:10,color:'#fff',weight:2,fillColor:agCol(a),fillOpacity:1}).addTo(agMap).bindTooltip(TR('Daag')+' #'+a.plot+', '+PL(a.up)).on('click',()=>{
     const cs=$$('#alerts .alert');cs.forEach((x,k)=>x.classList.toggle('sel',k===i));cs[i].scrollIntoView({block:'nearest',behavior:'smooth'})}));
 }
 $('#alerts').onclick=e=>{
@@ -108,7 +109,7 @@ const alerts=[];let simT=0,nightTest=false,rMap=null,rTimer=null,aid=0,lastSig='
 const hour=()=>+new Date().toLocaleString('en-GB',{timeZone:'Asia/Dhaka',hour:'numeric',hour12:false})%24;
 const isNight=()=>nightTest||hour()>=NIGHT[0]||hour()<NIGHT[1];
 const clk=()=>new Date().toLocaleTimeString('en-GB',{timeZone:'Asia/Dhaka',hour:'2-digit',minute:'2-digit',second:'2-digit'});
-const dur=x=>Math.floor(x/60)+' min '+String(Math.floor(x%60)).padStart(2,'0')+' s';
+const dur=x=>TR('{0} min {1} s',Math.floor(x/60),String(Math.floor(x%60)).padStart(2,'0'));
 function watch(b,kind,on){
   let a=alerts.find(x=>x.boat===b.id&&x.kind===kind&&!x.end);
   if(on&&!a){a={id:++aid,boat:b.id,what:b.kind,kind,t0:simT,time:clk(),st:0,end:0};alerts.unshift(a);if(alerts.length>12)alerts.length=12}
@@ -131,15 +132,15 @@ function step(){
   });
   draw();
 }
-const detail=a=>`Time ${a.time} (Bangladesh). Position ${a.ll[0].toFixed(5)}, ${a.ll[1].toFixed(5)}.${a.kind==='boundary'?' '+Math.round(a.d)+' m outside the line.':''} ${a.end?'Lasted':'Active for'} ${dur((a.end||simT)-a.t0)}.`;
+const detail=a=>`${TR('Time {0} (Bangladesh). Position {1}, {2}.',a.time,a.ll[0].toFixed(5),a.ll[1].toFixed(5))}${a.kind==='boundary'?' '+TR('{0} m outside the line.',Math.round(a.d)):''} ${TR(a.end?'Lasted {0}.':'Active for {0}.',dur((a.end||simT)-a.t0))}`;
 function draw(){
   if(rMap)boats.forEach(b=>{b.mk.setLatLng(b.ll).setStyle({fillColor:COL[b.st]});b.tr.setLatLngs(b.trail)});
-  $('#dredgers').innerHTML=boats.map(b=>`<div class="row"><b>${b.id}</b><span>${b.kind}</span><span class="badge ${BC[b.st]}">${LB[b.st]}</span><span class="sub">${b.sd<0?Math.round(-b.sd)+' m inside':Math.round(b.sd)+' m outside'} the line, ${b.pump?'pump on':'pump off'}</span></div>`).join('');
-  $('#clock').textContent='Bangladesh time '+clk()+'. The pump ban ('+NTXT+') is '+(isNight()?'active.':'not active.');
+  $('#dredgers').innerHTML=boats.map(b=>`<div class="row"><b>${b.id}</b><span>${TR(b.kind)}</span><span class="badge ${BC[b.st]}">${TR(LB[b.st])}</span><span class="sub">${TR('{0} m {1} the line, {2}',Math.round(Math.abs(b.sd)),TR(b.sd<0?'inside':'outside'),TR(b.pump?'pump on':'pump off'))}</span></div>`).join('');
+  $('#clock').textContent=TR('Bangladesh time {0}. The pump ban ({1}) is {2}.',clk(),TR(NTXT),TR(isNight()?'active':'not active'));
   const sig=alerts.map(a=>a.id+':'+a.st+':'+(a.end?1:0)).join();
   if(sig!==lastSig){
     lastSig=sig;
-    $('#bAlerts').innerHTML=alerts.length?alerts.map(a=>`<div class="alert${a.end?' ok':''}"><p><b>${a.kind==='boundary'?`Alert: ${a.what} #${a.boat} crossed outside the Balu Mahal boundary near Meghna Bridge. Illegal dredging in progress!`:`Alert: ${a.what} #${a.boat} is running its pump during banned nighttime hours (${NTXT}).`}</b></p><p class="sub" id="d${a.id}"></p><p class="sub">Sent to the River Police and the Deputy Commissioner (DC)</p><span class="badge ${a.end?'b-a':'b-x'}">${a.end?'Resolved':STAT[a.st]}</span> ${!a.end&&a.st<2?`<button type="button" class="btn sm" data-a="${a.id}">${a.st?'Dispatch patrol':'Acknowledge'}</button>`:''}</div>`).join(''):'<p class="sub">No alerts. All boats are inside the legal zone.</p>';
+    $('#bAlerts').innerHTML=alerts.length?alerts.map(a=>`<div class="alert${a.end?' ok':''}"><p><b>${a.kind==='boundary'?TR('Alert: {0} #{1} crossed outside the Balu Mahal boundary near Meghna Bridge. Illegal dredging in progress!',TR(a.what),a.boat):TR('Alert: {0} #{1} is running its pump during banned nighttime hours ({2}).',TR(a.what),a.boat,TR(NTXT))}</b></p><p class="sub" id="d${a.id}"></p><p class="sub">${TR('Sent to the River Police and the Deputy Commissioner (DC)')}</p><span class="badge ${a.end?'b-a':'b-x'}">${a.end?TR('Resolved'):TR(STAT[a.st])}</span> ${!a.end&&a.st<2?`<button type="button" class="btn sm" data-a="${a.id}">${TR(a.st?'Dispatch patrol':'Acknowledge')}</button>`:''}</div>`).join(''):`<p class="sub">${TR('No alerts. All boats are inside the legal zone.')}</p>`;
   }
   alerts.forEach(a=>{const e=$('#d'+a.id);if(e)e.textContent=detail(a)});
 }
@@ -148,8 +149,8 @@ function initRiver(){
   rMap=mkMap('riverMap');
   if(rMap){
     rMap.fitBounds(ZONE,{padding:[30,30]});
-    L.polygon(ZONE,{color:'#2ee59d',weight:3,dashArray:'8 6',fillColor:'#2ee59d',fillOpacity:.12}).addTo(rMap).bindTooltip('Legal Balu Mahal zone');
-    L.circleMarker(BRIDGE,{radius:6,color:'#fff',weight:2,fillColor:'#14201b',fillOpacity:1}).addTo(rMap).bindTooltip('Meghna Bridge',{permanent:true,direction:'right',offset:[8,0]});
+    L.polygon(ZONE,{color:'#2ee59d',weight:3,dashArray:'8 6',fillColor:'#2ee59d',fillOpacity:.12}).addTo(rMap).bindTooltip(TR('Legal Balu Mahal zone'));
+    L.circleMarker(BRIDGE,{radius:6,color:'#fff',weight:2,fillColor:'#14201b',fillOpacity:1}).addTo(rMap).bindTooltip(TR('Meghna Bridge'),{permanent:true,direction:'right',offset:[8,0]});
     boats.forEach(b=>{
       b.mk=L.circleMarker(b.ll,{radius:8,color:'#fff',weight:2,fillColor:COL[0],fillOpacity:1}).addTo(rMap).bindTooltip(b.id,{permanent:true,direction:'right',offset:[8,0]});
       b.tr=L.polyline([],{color:'#f2b134',weight:2,opacity:.9}).addTo(rMap);
@@ -164,6 +165,6 @@ $('#bAlerts').onclick=e=>{
   if(a.st===2){if(a.kind==='boundary')bt.mode='return';else bt.pump=0}
   lastSig='';draw();
 };
-$('#tDrift').onclick=e=>{tD=!tD;const b=boats[0];if(tD){b.mode='drift';b.v=[1.5,0]}else b.mode='return';e.target.textContent=tD?'Test: bring BD-07 back':'Test: BD-07 drifts to the bank'};
-$('#tNight').onclick=e=>{nightTest=!nightTest;e.target.textContent=nightTest?'Test: back to real time of day':'Test: simulate night'};
+$('#tDrift').onclick=e=>{tD=!tD;const b=boats[0];if(tD){b.mode='drift';b.v=[1.5,0]}else b.mode='return';e.target.textContent=tD?TR('Test: bring BD-07 back'):TR('Test: BD-07 drifts to the bank')};
+$('#tNight').onclick=e=>{nightTest=!nightTest;e.target.textContent=nightTest?TR('Test: back to real time of day'):TR('Test: simulate night')};
 })();

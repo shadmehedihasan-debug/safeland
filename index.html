@@ -7,11 +7,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="index.css">
 </head>
 <body>
 
 <section id="intro">
+  <button type="button" class="lang" data-lang-toggle></button>
   <div class="title">
     <h1>Safe Land</h1>
     <p>Every plot has a story. We keep it true.</p>
@@ -44,6 +46,7 @@
     <button type="button" class="back" id="back" aria-label="Back to previous page" title="Back">&larr;</button>
     <svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="22" fill="#fff"/><path d="M8 33a14 14 0 0 1 28 0z" fill="#006a4e"/><path d="M22 33V20M22 28l-5-5M22 25l5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
     <div><strong>Safe Land</strong><span>Participant and officer portal</span></div>
+    <button type="button" class="lang" data-lang-toggle></button>
   </div></header>
 
   <main class="wrap">
@@ -139,6 +142,7 @@
   <footer class="foot">Safe Land portal</footer>
 </div>
 
+<script src="i18n.js"></script>
 <script src="config.js"></script>
 <script src="storage.js"></script>
 <script src="index.js"></script>
