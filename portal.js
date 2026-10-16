@@ -41,24 +41,34 @@ $('#gTest').onclick=()=>{
   gl.unshift(`<b>${now()}</b><br>Someone has started an e-Mutation application on ${esc(p.place)}. An SMS and a call were sent to ${mask(me.phone||'')}. If this is not you, contact the AC (Land) office.`);
   S.log('guard alert',me.id,true);drawVault();
 };
-/* Link another parcel: goes under verification first, then is added only if it matches the land records */
-const pend=[],sleep=ms=>new Promise(r=>setTimeout(r,ms));
+/* Link another parcel: goes under verification, then is added only if it matches the land records.
+   Every request waits 10 to 60 seconds before it is checked, and the page says the result
+   will be available within 24 hours. */
+const WAIT=[10000,60000];
+let pend=S.pending(me.id);
 function drawVer(){
-  $('#verif').innerHTML=pend.length?pend.map(q=>`<div class="row"><b>Plot #${esc(q.daag)}, ${esc(q.mouza)}, ${esc(q.upazila)} (Khatian ${esc(q.khatian)})</b><span class="badge b-l">Checking</span><span class="sub">Matching with the land records...</span></div>`).join(''):'<p class="sub">Nothing is waiting for verification.</p>';
+  $('#verif').innerHTML=pend.length?pend.map(it=>{const q=it.q;return`<div class="row"><b>Plot #${esc(q.daag)}, ${esc(q.mouza)}, ${esc(q.upazila)} (Khatian ${esc(q.khatian)})</b><span class="badge b-l">Checking</span><span class="sub">Result will be available within 24 hours.</span></div>`}).join(''):'<p class="sub">Nothing is waiting for verification.</p>';
 }
-$('#fLand').onsubmit=async e=>{e.preventDefault();
-  const g=i=>$(i).value.trim(),q={district:g('#lD'),upazila:g('#lU'),mouza:g('#lM'),daag:g('#lDaag'),khatian:g('#lK')};
-  if(Object.values(q).some(x=>!x))return say('#lMsg','Fill in every field.',1);
-  e.target.reset();say('#lMsg','');pend.push(q);drawVer();
+async function settle(it){
   let r=null;
-  try{[r]=await Promise.all([S.verifyParcel(me.id,q),sleep(1500)])}catch(x){}
-  pend.splice(pend.indexOf(q),1);drawVer();
-  if(!r)say('#lMsg','Could not reach the database. Try again.',1);
-  else if(r.result==='verified'){say('#lMsg','Verified. The parcel was added to your vault.');drawVault()}
+  try{r=await S.verifyParcel(me.id,it.q)}catch(x){}
+  if(!r){say('#lMsg','Could not reach the database. We will try again shortly.',1);setTimeout(()=>settle(it),30000);return}
+  S.removePending(me.id,it.id);pend=S.pending(me.id);drawVer();
+  if(r.result==='verified'){say('#lMsg','Verified. The parcel was added to your vault.');drawVault()}
   else if(r.result==='linked')say('#lMsg','This parcel is already in your vault.');
   else say('#lMsg','Access denied. These details do not match the land records for your NID. The parcel was not added.',1);
+}
+const schedule=it=>setTimeout(()=>settle(it),Math.max(0,it.at-Date.now()));
+$('#fLand').onsubmit=e=>{e.preventDefault();
+  const g=i=>$(i).value.trim(),q={district:g('#lD'),upazila:g('#lU'),mouza:g('#lM'),daag:g('#lDaag'),khatian:g('#lK')};
+  if(Object.values(q).some(x=>!x))return say('#lMsg','Fill in every field.',1);
+  const it={id:Date.now()+'-'+Math.random().toString(36).slice(2,6),q,at:Date.now()+WAIT[0]+Math.random()*(WAIT[1]-WAIT[0])};
+  S.addPending(me.id,it);pend=S.pending(me.id);
+  e.target.reset();drawVer();
+  say('#lMsg','Request received. The result will be available within 24 hours.');
+  schedule(it);
 };
-drawVer();
+drawVer();pend.slice().forEach(schedule);
 drawVault();
 
 /* 2. Land Check (sample result: no real land records are connected) */

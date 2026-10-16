@@ -37,6 +37,7 @@ const LantStore = (() => {
   db.plots = db.plots || samplePlots();
   db.lands = db.lands || {}; db.guard = db.guard || {}; db.reports = db.reports || [];
   db.drafts = db.drafts || sampleDrafts();
+  db.pending = db.pending || {};
   db.records = db.records || sampleRecords();
 
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} };
@@ -161,6 +162,11 @@ const LantStore = (() => {
       if (!db.lands[nid]) { db.lands[nid] = sampleLands(); save(); }
       return db.lands[nid];
     },
+    /* Parcel requests waiting for their check (kept so they survive a page reload) */
+    pending: nid => (db.pending[nid] = db.pending[nid] || []),
+    addPending(nid, item) { this.pending(nid).push(item); save(); },
+    removePending(nid, id) { db.pending[nid] = this.pending(nid).filter(x => x.id !== id); save(); },
+
     /* A parcel is added only if it matches a land record owned by this NID.
        Returns { result: 'verified' | 'denied' | 'linked', place, area, tax }. */
     async verifyParcel(nid, q) {

@@ -31,7 +31,7 @@ index.html (intro) -> Enter portal -> login type page
 
 | Heading | What it does |
 |---|---|
-| My Land Vault | Lists the user's parcels, totals them against the 60-bigha ceiling (counted as 1,980 decimals), and has an anti-theft guard toggle with a test alert. A parcel the user tries to link goes under verification first. It is added only if it matches the land records registered to the user's NID. Otherwise the user sees Access denied and nothing is added. |
+| My Land Vault | Lists the user's parcels, totals them against the 60-bigha ceiling (counted as 1,980 decimals), and has an anti-theft guard toggle with a test alert. A parcel the user tries to link goes under verification first. It is added only if it matches the land records registered to the user's NID. Otherwise the user sees Access denied and nothing is added. Each request waits a random 10 to 60 seconds before it is checked, and the page tells the user the result will be available within 24 hours. |
 | Land Check | Takes district, upazila, mouza, daag and khatian. Returns a 0 to 100 score (Safe, Caution or High Risk) and four checks: ownership continuity, sub-registry lock, litigation and zoning. Daag numbers that match the corporate sample plots use their real lock state. |
 | Tax & Fee Calculator | Shows the fixed e-Mutation fee (BDT 1,170) and the percentage registration costs, plus economic codes for direct payment. |
 | Family Land Distributor | Computes Islamic inheritance shares as exact fractions, including the cases where shares are reduced or the remainder is returned. It can download a Warishan Buntonnama summary. |
@@ -101,6 +101,7 @@ The site is static and needs no build step.
 - **Fixed OTP.** Every OTP step accepts one fixed code stored in `storage.js`. No SMS is sent. Replace this with a real SMS service before real use. The OTP check also runs in the browser, so it can be bypassed.
 - **The public key is public.** Anyone can call the database functions with the anon key. The tables are protected, but there is no rate limiting on logins.
 - **Sample data.** Land records, court checks, zoning results, plots, satellite alerts and boat positions are sample or simulated. Nothing connects to a real land database, satellite feed or GPS tracker. Use dummy data only. Do not enter real names, NID numbers, phone numbers or land records.
+- **Verification delay.** The 10 to 60 second wait is part of the page. It shows how a review queue would feel and is not a security feature. Requests waiting for their check are saved in the browser.
 - **Reports.** Digging reports are saved without a name or NID. They are not delivered to the UNO, AC (Land) or River Police.
 - **Fee rates need checking.** The portal uses 1.5% stamp duty, 1% registration fee and 2% local government tax. Published guides disagree on these, and a 2026 registration ordinance may have changed them. Confirm the current rates before relying on the calculator. AIT has no default rate.
 - **Economic codes.** Only stamp duty (1162101) and document registration fee (1422201) are filled in. Other codes say to confirm with the office.
